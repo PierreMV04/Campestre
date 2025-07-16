@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
+console.log("🟢 Usando archivo:", __filename);
+
+
 // ✅ Obtener todas las reservas
 router.get('/', async (req, res) => {
   try {
