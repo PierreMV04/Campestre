@@ -12,9 +12,6 @@ function Reservas() {
     fecha_salida: ''
   });
 
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
-  const nombreUsuario = usuario?.nombre;
-
   // Cargar reservas y habitaciones al iniciar
   useEffect(() => {
     cargarReservas();
@@ -45,22 +42,10 @@ function Reservas() {
 
   const handleReserva = async (e) => {
     e.preventDefault();
-
-    const datos = {
-      ...nuevaReserva,
-      cliente: nombreUsuario || nuevaReserva.cliente, // Usa el nombre del usuario logueado si existe
-      estado: 'pendiente'
-    };
-
     try {
-      await api.crearReserva(datos);
+      await api.crearReserva(nuevaReserva);
       alert('✅ Reserva registrada exitosamente');
-      setNuevaReserva({
-        cliente: '',
-        habitacion_id: '',
-        fecha_entrada: '',
-        fecha_salida: ''
-      });
+      setNuevaReserva({ cliente: '', habitacion_id: '', fecha_entrada: '', fecha_salida: '' });
       cargarReservas();
       cargarHabitaciones();
     } catch (err) {
@@ -81,6 +66,8 @@ function Reservas() {
     }
   };
 
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const nombreUsuario = usuario?.nombre;
   const reservasFiltradas = reservas.filter(r => r.cliente === nombreUsuario);
 
   return (
@@ -109,19 +96,17 @@ function Reservas() {
 
       <form onSubmit={handleReserva} className="mb-4">
         <div className="row">
-          {!nombreUsuario && (
-            <div className="col-md-3">
-              <input
-                type="text"
-                name="cliente"
-                className="form-control"
-                placeholder="Tu nombre"
-                value={nuevaReserva.cliente}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          )}
+          <div className="col-md-3">
+            <input
+              type="text"
+              name="cliente"
+              className="form-control"
+              placeholder="Tu nombre"
+              value={nuevaReserva.cliente}
+              onChange={handleChange}
+              required
+            />
+          </div>
           <div className="col-md-3">
             <select
               name="habitacion_id"
@@ -184,7 +169,7 @@ function Reservas() {
             <tr key={res.id}>
               <td>{res.id}</td>
               <td>{res.cliente}</td>
-              <td>{res.nombre_habitacion || res.habitacion_id}</td>
+              <td>{res.nombre_habitacion}</td>
               <td>{res.fecha_entrada?.split('T')[0]}</td>
               <td>{res.fecha_salida?.split('T')[0]}</td>
               <td className={res.estado === 'anulada' ? 'text-danger' : 'text-success'}>
