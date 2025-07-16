@@ -20,12 +20,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ Crear nueva reserva (y bajar stock)
+// ✅ Crear nueva reserva (y bajar stock si hay disponibilidad)
 router.post('/', async (req, res) => {
   console.log("📥 Datos recibidos en reserva:", req.body);
   const { cliente, habitacion_id, fecha_entrada, fecha_salida, estado } = req.body;
 
   try {
+    // Verificar stock disponible
+    const stockRes = await pool.query(
+      'SELECT stock FROM habitaciones WHERE id = $1',
+      [habitacion_id]
+    );
+
+    if (stockRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Habitación no encontrada' });
+    }
+
+    const stock = stockRes.rows[0].stock;
+    if (stock <= 0) {
+      return res.status(400).json({ error: 'No hay disponibilidad para esta habitación' });
+    }
+
+    // Insertar reserva
     const reserva = await pool.query(
       `INSERT INTO reservas (cliente, habitacion_id, fecha_entrada, fecha_salida, estado)
        VALUES ($1, $2, $3, $4, $5)
@@ -33,7 +49,7 @@ router.post('/', async (req, res) => {
       [cliente, habitacion_id, fecha_entrada, fecha_salida, estado || 'confirmada']
     );
 
-    // 🔽 Bajar stock de la habitación
+    // Bajar stock
     await pool.query(
       `UPDATE habitaciones
        SET stock = stock - 1
@@ -48,15 +64,35 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ✅ Anular (cancelar) una reserva
+// ✅ Anular reserva (y subir stock)
 router.post('/anular/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Obtener la reserva para saber qué habitación es
+    const reserva = await pool.query(
+      'SELECT * FROM reservas WHERE id = $1',
+      [id]
+    );
+
+    if (reserva.rows.length === 0) {
+      return res.status(404).json({ error: 'Reserva no encontrada' });
+    }
+
+    const habitacion_id = reserva.rows[0].habitacion_id;
+
+    // Anular reserva
     const result = await pool.query(
       'UPDATE reservas SET estado = $1 WHERE id = $2 RETURNING *',
       ['anulada', id]
     );
+
+    // Subir stock
+    await pool.query(
+      'UPDATE habitaciones SET stock = stock + 1 WHERE id = $1',
+      [habitacion_id]
+    );
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error('❌ Error al anular reserva:', error);
