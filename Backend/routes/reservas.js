@@ -4,11 +4,15 @@ const pool = require('../db');
 
 console.log("🟢 Usando archivo:", __filename);
 
-
-// ✅ Obtener todas las reservas
+// ✅ Obtener todas las reservas (con nombre de habitación)
 router.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM reservas ORDER BY id');
+    const result = await pool.query(`
+      SELECT r.*, h.nombre AS nombre_habitacion
+      FROM reservas r
+      JOIN habitaciones h ON r.habitacion_id = h.id
+      ORDER BY r.id
+    `);
     res.json(result.rows);
   } catch (error) {
     console.error('❌ Error al obtener reservas:', error);
@@ -16,19 +20,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ Crear nueva reserva
+// ✅ Crear nueva reserva (y bajar stock)
 router.post('/', async (req, res) => {
   console.log("📥 Datos recibidos en reserva:", req.body);
   const { cliente, habitacion_id, fecha_entrada, fecha_salida, estado } = req.body;
 
   try {
-    const result = await pool.query(
+    const reserva = await pool.query(
       `INSERT INTO reservas (cliente, habitacion_id, fecha_entrada, fecha_salida, estado)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [cliente, habitacion_id, fecha_entrada, fecha_salida, estado || 'confirmada']
     );
-    res.status(201).json(result.rows[0]);
+
+    // 🔽 Bajar stock de la habitación
+    await pool.query(
+      `UPDATE habitaciones
+       SET stock = stock - 1
+       WHERE id = $1`,
+      [habitacion_id]
+    );
+
+    res.status(201).json(reserva.rows[0]);
   } catch (error) {
     console.error('❌ Error al crear reserva:', error);
     res.status(500).json({ error: 'Error al crear reserva' });
