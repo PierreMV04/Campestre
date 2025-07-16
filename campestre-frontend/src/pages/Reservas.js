@@ -124,9 +124,9 @@ function Reservas() {
           )}
           <div className="col-md-3">
             <select
-              name="id_habitacion"
+              name="habitacion_id"
               className="form-control"
-              value={nuevaReserva.id_habitacion}
+              value={nuevaReserva.habitacion_id}
               onChange={handleChange}
               required
             >
