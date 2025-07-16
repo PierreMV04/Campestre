@@ -5,10 +5,10 @@ const API_BASE = axios.create({
 });
 
 // 🔹 Habitaciones
-const getHabitaciones = () => axios.get(`${API_BASE}/habitaciones`);
+const getHabitaciones = () => API_BASE.get('/habitaciones');
 
 const crearHabitacion = ({ nombre, descripcion, precio, stock, estado, imagen_url }) =>
-  axios.post(`${API_BASE}/habitaciones`, {
+  API_BASE.post('/habitaciones', {
     nombre,
     descripcion,
     precio,
@@ -18,7 +18,7 @@ const crearHabitacion = ({ nombre, descripcion, precio, stock, estado, imagen_ur
   });
 
 const actualizarHabitacion = (id, { nombre, descripcion, precio, stock, estado, imagen_url }) =>
-  axios.put(`${API_BASE}/habitaciones/${id}`, {
+  API_BASE.put(`/habitaciones/${id}`, {
     nombre,
     descripcion,
     precio,
@@ -27,23 +27,23 @@ const actualizarHabitacion = (id, { nombre, descripcion, precio, stock, estado, 
     imagen_url,
   });
 
-const eliminarHabitacion = (id) => axios.delete(`${API_BASE}/habitaciones/${id}`);
+const eliminarHabitacion = (id) => API_BASE.delete(`/habitaciones/${id}`);
 
 // 🔹 Reservas
-const getReservas = () => axios.get(`${API_BASE}/reservas`);
-const crearReserva = (reserva) => axios.post(`${API_BASE}/reservas`, reserva);
-const anularReserva = (id) => axios.post(`${API_BASE}/reservas/anular/${id}`);
-const actualizarReserva = (id, datos) => axios.put(`${API_BASE}/reservas/${id}`, datos);
+const getReservas = () => API_BASE.get('/reservas');
+const crearReserva = (reserva) => API_BASE.post('/reservas', reserva);
+const anularReserva = (id) => API_BASE.post(`/reservas/anular/${id}`);
+const actualizarReserva = (id, datos) => API_BASE.put(`/reservas/${id}`, datos);
 
 // 🔹 Contacto
-const enviarContacto = (mensaje) => axios.post(`${API_BASE}/contacto`, mensaje);
-const getMensajesContacto = () => axios.get(`${API_BASE}/contacto`);
+const enviarContacto = (mensaje) => API_BASE.post('/contacto', mensaje);
+const getMensajesContacto = () => API_BASE.get('/contacto');
 
 // 🔹 Usuarios
-const getUsuarios = () => axios.get(`${API_BASE}/usuarios`);
-const actualizarUsuario = (id, datos) => axios.put(`${API_BASE}/usuarios/${id}`, datos);
-const crearUsuario = (datos) => axios.post(`${API_BASE}/usuarios`, datos);
-const loginUsuario = (datos) => axios.post(`${API_BASE}/auth/login`, datos);
+const getUsuarios = () => API_BASE.get('/usuarios');
+const actualizarUsuario = (id, datos) => API_BASE.put(`/usuarios/${id}`, datos);
+const crearUsuario = (datos) => API_BASE.post('/usuarios', datos);
+const loginUsuario = (datos) => API_BASE.post('/auth/login', datos);
 
 const api = {
   getHabitaciones,
@@ -62,7 +62,7 @@ const api = {
   getUsuarios,
   actualizarUsuario,
   crearUsuario,
-  loginUsuario, // ✅ Agregado correctamente
+  loginUsuario,
 };
 
 export default api;
