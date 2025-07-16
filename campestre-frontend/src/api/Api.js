@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000/api'
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:4000/api'
 });
 
 // 🔹 Habitaciones
