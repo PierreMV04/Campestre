@@ -7,10 +7,13 @@ function Reservas() {
   const [habitaciones, setHabitaciones] = useState([]);
   const [nuevaReserva, setNuevaReserva] = useState({
     cliente: '',
-    habitacion_id: '',
+    id_habitacion: '',
     fecha_entrada: '',
     fecha_salida: ''
   });
+
+  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const nombreUsuario = usuario?.nombre;
 
   // Cargar reservas y habitaciones al iniciar
   useEffect(() => {
@@ -42,10 +45,22 @@ function Reservas() {
 
   const handleReserva = async (e) => {
     e.preventDefault();
+
+    const datos = {
+      ...nuevaReserva,
+      cliente: nombreUsuario || nuevaReserva.cliente, // Usa el nombre del usuario logueado si existe
+      estado: 'pendiente'
+    };
+
     try {
-      await api.crearReserva(nuevaReserva);
+      await api.crearReserva(datos);
       alert('✅ Reserva registrada exitosamente');
-      setNuevaReserva({ cliente: '', habitacion_id: '', fecha_entrada: '', fecha_salida: '' });
+      setNuevaReserva({
+        cliente: '',
+        id_habitacion: '',
+        fecha_entrada: '',
+        fecha_salida: ''
+      });
       cargarReservas();
       cargarHabitaciones();
     } catch (err) {
@@ -66,8 +81,6 @@ function Reservas() {
     }
   };
 
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
-  const nombreUsuario = usuario?.nombre;
   const reservasFiltradas = reservas.filter(r => r.cliente === nombreUsuario);
 
   return (
@@ -96,22 +109,24 @@ function Reservas() {
 
       <form onSubmit={handleReserva} className="mb-4">
         <div className="row">
-          <div className="col-md-3">
-            <input
-              type="text"
-              name="cliente"
-              className="form-control"
-              placeholder="Tu nombre"
-              value={nuevaReserva.cliente}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {!nombreUsuario && (
+            <div className="col-md-3">
+              <input
+                type="text"
+                name="cliente"
+                className="form-control"
+                placeholder="Tu nombre"
+                value={nuevaReserva.cliente}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          )}
           <div className="col-md-3">
             <select
-              name="habitacion_id"
+              name="id_habitacion"
               className="form-control"
-              value={nuevaReserva.habitacion_id}
+              value={nuevaReserva.id_habitacion}
               onChange={handleChange}
               required
             >
@@ -169,7 +184,7 @@ function Reservas() {
             <tr key={res.id}>
               <td>{res.id}</td>
               <td>{res.cliente}</td>
-              <td>{res.nombre_habitacion}</td>
+              <td>{res.nombre_habitacion || res.id_habitacion}</td>
               <td>{res.fecha_entrada?.split('T')[0]}</td>
               <td>{res.fecha_salida?.split('T')[0]}</td>
               <td className={res.estado === 'anulada' ? 'text-danger' : 'text-success'}>
