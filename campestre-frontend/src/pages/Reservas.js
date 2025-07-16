@@ -7,7 +7,7 @@ function Reservas() {
   const [habitaciones, setHabitaciones] = useState([]);
   const [nuevaReserva, setNuevaReserva] = useState({
     cliente: '',
-    id_habitacion: '',
+    habitacion_id: '',
     fecha_entrada: '',
     fecha_salida: ''
   });
@@ -57,7 +57,7 @@ function Reservas() {
       alert('✅ Reserva registrada exitosamente');
       setNuevaReserva({
         cliente: '',
-        id_habitacion: '',
+        habitacion_id: '',
         fecha_entrada: '',
         fecha_salida: ''
       });
@@ -184,7 +184,7 @@ function Reservas() {
             <tr key={res.id}>
               <td>{res.id}</td>
               <td>{res.cliente}</td>
-              <td>{res.nombre_habitacion || res.id_habitacion}</td>
+              <td>{res.nombre_habitacion || res.habitacion_id}</td>
               <td>{res.fecha_entrada?.split('T')[0]}</td>
               <td>{res.fecha_salida?.split('T')[0]}</td>
               <td className={res.estado === 'anulada' ? 'text-danger' : 'text-success'}>
