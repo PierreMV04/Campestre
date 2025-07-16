@@ -1,0 +1,48 @@
+/* admin.css */
+
+.admin-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tab-buttons button {
+  margin: 5px;
+  min-width: 120px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+@media (max-width: 576px) {
+  .admin-container {
+    padding: 15px;
+  }
+
+  .tab-buttons button {
+    flex: 1 1 100%;
+    font-size: 16px;
+  }
+
+  .table td,
+  .table th {
+    white-space: nowrap;
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .table th {
+    text-align: center;
+  }
+}

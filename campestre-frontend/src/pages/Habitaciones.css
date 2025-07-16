@@ -1,0 +1,8 @@
+/* Estilos personalizados para las habitaciones (opcional) */
+.card-title {
+  font-weight: bold;
+}
+
+.card-footer button {
+  width: 100%;
+}
