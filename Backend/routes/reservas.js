@@ -20,13 +20,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// ✅ Crear nueva reserva (y bajar stock si hay disponibilidad)
+// ✅ Crear nueva reserva (con validación de fechas)
 router.post('/', async (req, res) => {
   console.log("📥 Datos recibidos en reserva:", req.body);
   const { cliente, habitacion_id, fecha_entrada, fecha_salida, estado } = req.body;
 
   try {
-    // Verificar stock disponible
+    // Validar fechas
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Ignorar hora
+
+    const entrada = new Date(fecha_entrada);
+    const salida = new Date(fecha_salida);
+
+    if (entrada < hoy) {
+      return res.status(400).json({ error: 'La fecha de entrada no puede ser menor a hoy.' });
+    }
+
+    if (salida < entrada) {
+      return res.status(400).json({ error: 'La fecha de salida no puede ser menor a la de entrada.' });
+    }
+
+    // Verificar stock
     const stockRes = await pool.query(
       'SELECT stock FROM habitaciones WHERE id = $1',
       [habitacion_id]
@@ -41,7 +56,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'No hay disponibilidad para esta habitación' });
     }
 
-    // Insertar reserva
+    // Crear reserva
     const reserva = await pool.query(
       `INSERT INTO reservas (cliente, habitacion_id, fecha_entrada, fecha_salida, estado)
        VALUES ($1, $2, $3, $4, $5)
@@ -51,9 +66,7 @@ router.post('/', async (req, res) => {
 
     // Bajar stock
     await pool.query(
-      `UPDATE habitaciones
-       SET stock = stock - 1
-       WHERE id = $1`,
+      `UPDATE habitaciones SET stock = stock - 1 WHERE id = $1`,
       [habitacion_id]
     );
 
@@ -63,6 +76,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Error al crear reserva' });
   }
 });
+
 
 // ✅ Anular reserva (y subir stock)
 router.post('/anular/:id', async (req, res) => {
