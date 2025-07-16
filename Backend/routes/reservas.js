@@ -15,6 +15,7 @@ router.get('/', async (req, res) => {
 
 // ✅ Crear nueva reserva
 router.post('/', async (req, res) => {
+   console.log("📥 Datos recibidos en reserva:", req.body);
   const { cliente, habitacion, fecha_entrada, fecha_salida, estado } = req.body;
 
   try {
