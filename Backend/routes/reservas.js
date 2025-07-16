@@ -15,15 +15,15 @@ router.get('/', async (req, res) => {
 
 // ✅ Crear nueva reserva
 router.post('/', async (req, res) => {
-   console.log("📥 Datos recibidos en reserva:", req.body);
-  const { cliente, habitacion, fecha_entrada, fecha_salida, estado } = req.body;
+  console.log("📥 Datos recibidos en reserva:", req.body);
+  const { cliente, habitacion_id, fecha_entrada, fecha_salida, estado } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO reservas (cliente, habitacion, fecha_entrada, fecha_salida, estado)
+      `INSERT INTO reservas (cliente, habitacion_id, fecha_entrada, fecha_salida, estado)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [cliente, habitacion, fecha_entrada, fecha_salida, estado || 'confirmada']
+      [cliente, habitacion_id, fecha_entrada, fecha_salida, estado || 'confirmada']
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
