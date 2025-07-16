@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE = 'http://campestre-production.up.railway.app/api';
+const API_BASE = axios.create({
+  baseURL: 'https://campestre-production.up.railway.app/api'
+});
+
 
 // 🔹 Habitaciones
 const getHabitaciones = () => API_BASE.get('/habitaciones');
